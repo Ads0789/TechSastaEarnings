@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,12 @@ import {
 } from "react-native";
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { ThemeContext } from "../context/ThemeContext"; // ✅ Step 1: Import ThemeContext
 
 export default function DashboardScreen({ navigation }) {
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { theme, toggleTheme } = useContext(ThemeContext); // ✅ Step 2: Use useContext
 
   const user = auth.currentUser;
 
@@ -35,7 +37,7 @@ export default function DashboardScreen({ navigation }) {
       const userRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(userRef);
       const currentBalance = docSnap.data().balance || 0;
-      const newBalance = currentBalance + 5; // 🔁 add ₹5 per click
+      const newBalance = currentBalance + 5;
       await updateDoc(userRef, { balance: newBalance });
       setBalance(newBalance);
       Alert.alert("Congrats!", "₹5 earned successfully.");
@@ -75,30 +77,3 @@ export default function DashboardScreen({ navigation }) {
           onPress={() => navigation.navigate("Withdraw")}
           color="#ffc107"
         />
-      </View>
-
-      <View style={styles.button}>
-        <Button title="Logout" onPress={handleLogout} color="#dc3545" />
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
-  title: { fontSize: 20, textAlign: "center", marginBottom: 20 },
-  balance: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 40,
-  },
-  button: {
-    marginVertical: 10,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
