@@ -10,6 +10,19 @@ import WithdrawScreen from "./screens/WithdrawScreen";
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
 
 const Stack = createNativeStackNavigator();
+import * as Notifications from 'expo-notifications';
+import { registerForPushNotificationsAsync } from './utils/notifications';
+
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (u) => {
+    setUser(u);
+  });
+
+  // 🔔 Register for notifications
+  registerForPushNotificationsAsync();
+
+  return unsubscribe;
+}, []);
 
 export default function App() {
   const [user, setUser] = useState(null);
