@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 
 import LoginScreen from "./screens/LoginScreen";
+import DashboardScreen from "./screens/DashboardScreen";
+import WithdrawScreen from "./screens/WithdrawScreen";
+import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,14 +22,23 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
-          <Stack.Screen name="Dashboard" component={() => null} />
-        ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+    <ThemeProvider>
+      <ThemeContext.Consumer>
+        {({ theme }) => (
+          <NavigationContainer theme={theme === "dark" ? DarkTheme : DefaultTheme}>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              {user ? (
+                <>
+                  <Stack.Screen name="Dashboard" component={DashboardScreen} />
+                  <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+                </>
+              ) : (
+                <Stack.Screen name="Login" component={LoginScreen} />
+              )}
+            </Stack.Navigator>
+          </NavigationContainer>
         )}
-      </Stack.Navigator>
-    </NavigationContainer>
+      </ThemeContext.Consumer>
+    </ThemeProvider>
   );
 }
